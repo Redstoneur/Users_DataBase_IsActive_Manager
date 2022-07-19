@@ -1,0 +1,9 @@
+{
+  "name": "User-Manager",
+  "version": "0.0.1",
+  "dependencies": {
+    "Python-Utilities": "https://github.com/Redstoneur/Python-Utilities.git"
+  },
+  "description": "A simple user-manager for Redstoneur's servers.",
+  "author": "Redstoneur"
+}

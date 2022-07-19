@@ -1,0 +1,18 @@
+{
+  "host": "localhost",
+  "port": "3306",
+  "user": "administrateur",
+  "password": "Lp1Bb4Tw3Glg!",
+  "name": "egos_one_altice",
+  "table": "compte",
+  "column_IsActive": "actif",
+  "search_column": [
+    "id_compte",
+    "nom",
+    "prenom",
+    "login",
+    "actif",
+    "reset",
+    "connexion_errors"
+  ]
+}
