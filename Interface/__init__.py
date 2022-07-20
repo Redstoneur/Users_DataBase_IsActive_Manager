@@ -106,12 +106,9 @@ class Interface(tk.Tk):
             sup: int = 0
             if (self.search_column_count / 2) % 2 == 1 \
                     and (col == self.search_column_count - 2 or col == self.search_column_count - 1):
-                print("col: " + str(col))
                 columnspan = 2
                 if col == self.search_column_count - 1:
                     sup = 1
-
-            print(col, columnspan)
 
             if col % 4 == 0:
                 row += 1
@@ -142,9 +139,6 @@ class Interface(tk.Tk):
         labelVersion = tk.Label(self, text="v" + Info.get_version())
         labelVersion.config(font=("Arial", 7))
         labelVersion.grid(row=row, column=self.grid_columnconfigure_Max - 1, sticky="se")
-
-        print(row)
-        print(self.grid_rowconfigure_Max)
 
     def quit(self):
         """
