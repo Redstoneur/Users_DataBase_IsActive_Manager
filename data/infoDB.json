@@ -4,7 +4,8 @@
   "user": "",
   "password": "",
   "name": "",
-  "table": "",
+  "table_users": "",
   "column_IsActive": "",
-  "search_column": [ ]
+  "search_column": [],
+  "afficher_column": []
 }
