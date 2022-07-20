@@ -7,6 +7,7 @@
   "table_users": "",
   "ID_field": "",
   "column_IsActive": "",
+  "set_IsActive_special": [],
   "search_column": [],
   "afficher_column": []
 }
