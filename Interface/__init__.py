@@ -6,22 +6,36 @@ from Interface.UtileFonction import *
 ########################################################################################################################
 
 class Interface(tk.Tk):
-    grid_rowconfigure_Max: int = 10
+    grid_rowconfigure_Max: int = 5
     grid_columnconfigure_Max: int = 4
+    search_column_count: int = len(InfoDb.get("search_column")) * 2
 
     def __init__(self, Dimension: [int, int]):
         """
-        :param InfoDbPath: Path to the infoDB.json file
+        Init the interface
+        :param Dimension: [width, height]
         """
         super().__init__()
 
-        self.title(str(Info.get_name()+" - "+Info.get_version()))
+        self.title(str(Info.get_name() + " - " + Info.get_version()))
         self.geometry(str(Dimension[0]) + "x" + str(Dimension[1]))
+
+        self.grid_columnconfigure_Max = self.search_column_count
+        if self.grid_columnconfigure_Max > 4:
+            self.grid_columnconfigure_Max = 4
+
+        self.grid_rowconfigure_Max = 5 + self.search_column_count // 4
+        if (self.search_column_count / 2) % 2 == 1:
+            self.grid_rowconfigure_Max += 1
 
         self.grid()
         self.createWidgets()
 
     def createWidgets(self):
+        """
+        Create the widgets
+        :return:
+        """
 
         labelTitre: tk.Label
         labelTitreSubligne: tk.Label
@@ -31,7 +45,10 @@ class Interface(tk.Tk):
         # labelAddDump: tk.Label
         # textfieldPath: tk.Text
         # RunButton: tk.Button
-        # ReloadButton: tk.Button
+        ReloadButton: tk.Button
+
+        ListInfoSearchTextField: list[tk.Label]
+        ListSearchTextField: list[tk.Text]
 
         labelAuthor: tk.Label
         labelCopyright: tk.Label
@@ -63,9 +80,50 @@ class Interface(tk.Tk):
         row += 1
 
         # TableInfoUsers
-        TableInfoUsers = Tableau(self, liste=DB.select(table=str(InfoDb.get("table_users")), select=["*"], limit=10))
+        TableInfoUsers = Tableau(self,
+                                 liste=[InfoDb.get("afficher_column") + [""]] + DB.select(
+                                     table=str(InfoDb.get("table_users")),
+                                     select=InfoDb.get("afficher_column"),
+                                     limit=10))
         TableInfoUsers.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
 
+        # position
+        row += 1
+
+        ReloadButton = tk.Button(self, text="Search",
+                                 command=lambda: Reload(table=TableInfoUsers,
+                                                        ListInfoSearch=ListInfoSearchTextField,
+                                                        ListSearch=ListSearchTextField))
+        ReloadButton.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
+
+        # position
+        row += 1
+
+        ListInfoSearchTextField = []
+        ListSearchTextField = []
+        for col in range(len(InfoDb.get("search_column")) * 2):
+            columnspan: int = 1
+            sup: int = 0
+            if (self.search_column_count / 2) % 2 == 1 \
+                    and (col == self.search_column_count - 2 or col == self.search_column_count - 1):
+                print("col: " + str(col))
+                columnspan = 2
+                if col == self.search_column_count - 1:
+                    sup = 1
+
+            print(col, columnspan)
+
+            if col % 4 == 0:
+                row += 1
+            if col % 2 == 1:
+                ListSearchTextField.append(tk.Text(self, height=1, width=20))
+                ListSearchTextField[-1].grid(row=row, column=col % 4 + sup, columnspan=columnspan, sticky="")
+                ListSearchTextField[-1].insert(tk.END, "")
+                ListSearchTextField[-1].config(font=("Courier", 10))
+            else:
+                ListInfoSearchTextField.append(tk.Label(self, text=InfoDb.get("search_column")[col // 2] + " : "))
+                ListInfoSearchTextField[-1].grid(row=row, column=col % 4 + sup, columnspan=columnspan, sticky="")
+                ListInfoSearchTextField[-1].config(font=("Courier", 10))
 
         # position
         row += 1
@@ -86,6 +144,11 @@ class Interface(tk.Tk):
         labelVersion.grid(row=row, column=self.grid_columnconfigure_Max - 1, sticky="se")
 
         print(row)
+        print(self.grid_rowconfigure_Max)
 
     def quit(self):
+        """
+        Quit the program
+        :return:
+        """
         self.master.destroy()

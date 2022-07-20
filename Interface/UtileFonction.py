@@ -55,7 +55,7 @@ def CleanTerminal(errorLabel: tk.Label = None) -> None:
 
 class Tableau(tk.Frame):
 
-    def __init__(self, parent,liste = None, rows=10, columns=10):
+    def __init__(self, parent, liste=None, rows=10, columns=10):
         tk.Frame.__init__(self, parent)
         self._widgets = []
         if liste is not None:
@@ -70,12 +70,15 @@ class Tableau(tk.Frame):
         for row in range(self._rows):
             current_row = []
             for column in range(self._columns):
-                if liste is not None:
-                    string: str = str(liste[row][column])
+                if column == self._columns - 1 and row != 0:
+                    widget = tk.Button(self, text="string")
                 else:
-                    string: str = '(' + str(row) + ':' + str(column) + ')'
+                    if liste is not None:
+                        string: str = str(liste[row][column])
+                    else:
+                        string: str = '(' + str(row) + ':' + str(column) + ')'
+                    widget = tk.Label(self, text=string)
 
-                widget = tk.Label(self, text=string)
                 widget.grid(row=row, column=column, sticky="nsew")
                 current_row.append(widget)
                 self._widgets.append(current_row)
@@ -87,15 +90,33 @@ class Tableau(tk.Frame):
         return self._widgets[row][column].cget("text")
 
     def clear(self):
-        self.destroy()
+        for row in self._widgets:
+            for widget in row:
+                widget.destroy()
+
+    def update(self, liste=None) -> None:
+        self.clear()
+        self.create_widgets(liste)
 
 
-def Reload(table: Tableau) -> None:
+def Reload(table: Tableau,
+           ListInfoSearch: list[tk.Label],
+           ListSearch: list[tk.Text]) -> None:
     """
     reload the list of users
     :param table: Table, table of users
     :return: None
     """
-    table.clear()
-    listOfUsers = DB.select(str(InfoDb.get("table_users")), ["*"])
-    table.create_widgets(listOfUsers)
+    # create of Where clause
+    where: str = "1"
+    for i in range(len(ListInfoSearch)):
+        if ListSearch[i].get("1.0", "end-1c") != "":
+            where += " AND " + ListInfoSearch[i].cget("text")[:-3] + " LIKE '%" + ListSearch[i].get("1.0",
+                                                                                                    "end-1c") + "%'"
+
+    listOfUsers = DB.select(table=str(InfoDb.get("table_users")),
+                            select=list(InfoDb.get("afficher_column")),
+                            where=where,
+                            limit=10)
+
+    table.update(liste=[InfoDb.get("afficher_column")] + listOfUsers)
