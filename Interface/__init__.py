@@ -1,5 +1,4 @@
-import tkinter as tk
-from Interface.DatabaseExecutor import *
+from Interface.UtileFonction import *
 
 
 ########################################################################################################################
@@ -7,52 +6,37 @@ from Interface.DatabaseExecutor import *
 ########################################################################################################################
 
 class Interface(tk.Tk):
-    InfoDb: utils.JsonFile
-    DB: DatabaseExecutor
+    grid_rowconfigure_Max: int = 10
+    grid_columnconfigure_Max: int = 4
 
-    grid_rowconfigure_Max: int = 8
-    grid_columnconfigure_Max: int = 3
-
-    def __init__(self, Title: str, Dimension: [int, int], InfoDbPath: str = "./data/infoDB.json"):
+    def __init__(self, Dimension: [int, int]):
         """
         :param InfoDbPath: Path to the infoDB.json file
         """
         super().__init__()
-        self.InfoDb = utils.JsonFile(InfoDbPath)
-        if self.InfoDb.get("user") is None \
-                or self.InfoDb.get("password") is None \
-                or self.InfoDb.get("host") is None \
-                or self.InfoDb.get("port") is None \
-                or self.InfoDb.get("name") is None:
-            print("Error: infoDB.json is not correctly formatted")
-            print("We don't have all the necessary information to connect to the database")
-            print("We don't have : ")
-            if self.InfoDb.get("user") is None:
-                print("- user")
-            if self.InfoDb.get("password") is None:
-                print("- password")
-            if self.InfoDb.get("host") is None:
-                print("- host")
-            if self.InfoDb.get("port") is None:
-                print("- port")
-            if self.InfoDb.get("name") is None:
-                print("- name")
-            exit()
-        else:
-            user = self.InfoDb.get("user")
-            password = self.InfoDb.get("password")
-            host = self.InfoDb.get("host")
-            port = self.InfoDb.get("port")
-            name = self.InfoDb.get("name")
-            self.DB = DatabaseExecutor(user=user, password=password, host=host, port=port, name=name)
 
-        self.title(Title)
+        self.title(str(Info.get_name()+" - "+Info.get_version()))
         self.geometry(str(Dimension[0]) + "x" + str(Dimension[1]))
 
         self.grid()
         self.createWidgets()
 
     def createWidgets(self):
+
+        labelTitre: tk.Label
+        labelTitreSubligne: tk.Label
+
+        TableInfoUsers: Tableau
+
+        # labelAddDump: tk.Label
+        # textfieldPath: tk.Text
+        # RunButton: tk.Button
+        # ReloadButton: tk.Button
+
+        labelAuthor: tk.Label
+        labelCopyright: tk.Label
+        labelVersion: tk.Label
+
         for i in range(self.grid_rowconfigure_Max):
             self.grid_rowconfigure(i, weight=1)
 
@@ -62,9 +46,46 @@ class Interface(tk.Tk):
         # position
         row: int = 0
 
-        labelTitre = tk.Label(self, text="cc")
+        # label titre
+        labelTitre = tk.Label(self, text=Info.get_name())
         labelTitre.config(font=("Courier", 20))
         labelTitre.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
+
+        # position
+        row += 1
+
+        # label subtitle
+        labelTitreSubligne = tk.Label(self, text=Info.get_version())
+        labelTitreSubligne.config(font=("Courier", 10))
+        labelTitreSubligne.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
+
+        # position
+        row += 1
+
+        # TableInfoUsers
+        TableInfoUsers = Tableau(self, liste=DB.select(table=str(InfoDb.get("table_users")), select=["*"], limit=10))
+        TableInfoUsers.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
+
+
+        # position
+        row += 1
+
+        # label Author
+        labelAuthor = tk.Label(self, text=Info.get_author())
+        labelAuthor.config(font=("Arial", 7))
+        labelAuthor.grid(row=row, column=0, sticky="sw")
+
+        # label Copyright
+        labelCopyright = tk.Label(self, text=Info.get_email())
+        labelCopyright.config(font=("Arial", 7))
+        labelCopyright.grid(row=row, column=1, sticky="s")
+
+        # label version
+        labelVersion = tk.Label(self, text="v" + Info.get_version())
+        labelVersion.config(font=("Arial", 7))
+        labelVersion.grid(row=row, column=self.grid_columnconfigure_Max - 1, sticky="se")
+
+        print(row)
 
     def quit(self):
         self.master.destroy()

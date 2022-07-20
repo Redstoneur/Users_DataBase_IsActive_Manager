@@ -56,10 +56,11 @@ class DatabaseExecutor:
     def execute(self, query, values=None):
         try:
             self.cursor.execute(query, values)
-            self.connection.commit()
         except Exception as e:
             print(e)
             exit()
+        else:
+            return self.cursor.fetchall()
 
     def fetchone(self):
         return self.cursor.fetchone()
@@ -71,7 +72,7 @@ class DatabaseExecutor:
         self.cursor.close()
         self.connection.close()
 
-    def select(self, table: str, select: list[str], where: str = None) -> list:
+    def select(self, table: str, select: list[str], where: str = None, limit: int = None, order: str = None, having: str = None) -> list:
         query = "SELECT "
         for i in select:
             query += i + ","
@@ -79,8 +80,13 @@ class DatabaseExecutor:
         query += " FROM " + table
         if where is not None:
             query += " WHERE " + where
-        self.execute(query)
-        return self.fetchall()
+        if order is not None:
+            query += " ORDER BY " + order
+        if having is not None:
+            query += " HAVING " + having
+        if limit is not None:
+            query += " LIMIT " + str(limit)
+        return self.execute(query)
 
     def update(self, table: str, set: list[[str, str]], where: str = None) -> None:
         query = "UPDATE " + table + " SET "
