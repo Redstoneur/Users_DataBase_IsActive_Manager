@@ -119,23 +119,26 @@ class Tableau(tk.Frame):
             current_row = []
             for column in range(self._columns):
                 if column == self._columns - 1 and row != 0:
-                    actif:bool = DB.select(table=str(InfoDb.get("table_users")),
-                                           select=[str(InfoDb.get("column_IsActive"))],
-                                           where="id = " + str(liste[row][0])
+                    relative_ID: int = int(liste[row][0])
+                    actif: bool = DB.select(table=str(InfoDb.get("table_users")),
+                                            select=[str(InfoDb.get("column_IsActive"))],
+                                            where=str(InfoDb.get("ID_field")) + " = " + str(relative_ID)
+                                            )[0][0]
                     if actif:
-                        current_row.append(tk.Label(self, text="Actif", bg="green"))
+                        current_row.append(tk.Button(self, text="Actif", bg="green",
+                                           command=lambda: self.activity_Button(id=relative_ID, setActivity=False)))
                     else:
-                        current_row.append(tk.Label(self, text="Inactif", bg="red"))
+                        current_row.append(tk.Button(self, text="Inactif", bg="red",
+                                           command=lambda: self.activity_Button(id=relative_ID, setActivity=True)))
                 else:
                     if liste is not None:
                         string: str = str(liste[row][column])
                     else:
                         string: str = '(' + str(row) + ':' + str(column) + ')'
-                    widget = tk.Label(self, text=string)
+                    current_row.append(tk.Label(self, text=string))
 
-                widget.grid(row=row, column=column, sticky="nsew")
-                current_row.append(widget)
-                self._widgets.append(current_row)
+                current_row[-1].grid(row=row, column=column, sticky="nsew")
+            self._widgets.append(current_row)
 
     def update(self, liste=None, clean: bool = True) -> None:
         """
@@ -162,6 +165,16 @@ class Tableau(tk.Frame):
             self.update(liste=[afficher_column_table], clean=clean)
         else:
             self.update(liste=[afficher_column_table] + listOfUsers, clean=clean)
+
+    def activity_Button(self, id: int, setActivity: bool) -> None:
+        """
+        the effect of the activity button
+        :return:
+        """
+        DB.update(table=str(InfoDb.get("table_users")),
+                  set=[[str(InfoDb.get("column_IsActive")), str(setActivity)]],
+                  where=str(InfoDb.get("ID_field")) + " = " + str(id))
+        self.load()
 
 
 def Search(table: Tableau,
