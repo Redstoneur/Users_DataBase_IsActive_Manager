@@ -114,7 +114,7 @@ class Interface(tk.Tk):
         row += 1
 
         # TableInfoUsers
-        TableInfoUsers = Tableau(self)
+        TableInfoUsers = Tableau(parent=self)
         TableInfoUsers.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
 
         # position

@@ -1,6 +1,6 @@
 {
   "name": "User-Manager",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "date-created": "2022-07-19",
   "description-fr": "Dump Manager est un outil de gestion des dumps de bases de données. Il permet de gérer les dumps de bases de données et de les restaurer.",
   "description-en": "Dump Manager is a tool to manage database dumps. It allows you to manage database dumps and restore them.",

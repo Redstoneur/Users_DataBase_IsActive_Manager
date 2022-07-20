@@ -20,7 +20,6 @@ class DatabaseExecutor:
         self.connection = None
         self.cursor = None
 
-
         if self.name is not None:
             self.connectDB()
         else:
@@ -53,14 +52,17 @@ class DatabaseExecutor:
             print(e)
             exit()
 
-    def execute(self, query, values=None):
+    def execute(self, query, isSelect: bool = False):
         try:
-            self.cursor.execute(query, values)
+            self.cursor.execute(query)
         except Exception as e:
             print(e)
             exit()
         else:
-            return self.cursor.fetchall()
+            if isSelect:
+                return self.cursor.fetchall()
+            else:
+                self.connection.commit()
 
     def fetchone(self):
         return self.cursor.fetchone()
@@ -72,7 +74,8 @@ class DatabaseExecutor:
         self.cursor.close()
         self.connection.close()
 
-    def select(self, table: str, select: list[str], where: str = None, limit: int = None, order: str = None, having: str = None) -> list:
+    def select(self, table: str, select: list[str], where: str = None, limit: int = None, order: str = None,
+               having: str = None) -> list:
         query = "SELECT "
         for i in select:
             query += i + ","
@@ -86,7 +89,7 @@ class DatabaseExecutor:
             query += " HAVING " + having
         if limit is not None:
             query += " LIMIT " + str(limit)
-        return self.execute(query)
+        return self.execute(query=query, isSelect=True)
 
     def update(self, table: str, set: list[[str, str]], where: str = None) -> None:
         query = "UPDATE " + table + " SET "
@@ -95,4 +98,4 @@ class DatabaseExecutor:
         query = query[:-1]
         if where is not None:
             query += " WHERE " + where
-        self.execute(query)
+        self.execute(query=query)
