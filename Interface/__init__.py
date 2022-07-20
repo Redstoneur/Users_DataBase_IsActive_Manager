@@ -79,26 +79,6 @@ class Interface(tk.Tk):
         # position
         row += 1
 
-        # TableInfoUsers
-        TableInfoUsers = Tableau(self,
-                                 liste=[InfoDb.get("afficher_column") + [""]] + DB.select(
-                                     table=str(InfoDb.get("table_users")),
-                                     select=InfoDb.get("afficher_column"),
-                                     limit=10))
-        TableInfoUsers.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
-
-        # position
-        row += 1
-
-        ReloadButton = tk.Button(self, text="Search",
-                                 command=lambda: Reload(table=TableInfoUsers,
-                                                        ListInfoSearch=ListInfoSearchTextField,
-                                                        ListSearch=ListSearchTextField))
-        ReloadButton.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
-
-        # position
-        row += 1
-
         ListInfoSearchTextField = []
         ListSearchTextField = []
         for col in range(len(InfoDb.get("search_column")) * 2):
@@ -106,9 +86,7 @@ class Interface(tk.Tk):
             sup: int = 0
             if (self.search_column_count / 2) % 2 == 1 \
                     and (col == self.search_column_count - 2 or col == self.search_column_count - 1):
-                columnspan = 2
-                if col == self.search_column_count - 1:
-                    sup = 1
+                sup = 1
 
             if col % 4 == 0:
                 row += 1
@@ -120,7 +98,24 @@ class Interface(tk.Tk):
             else:
                 ListInfoSearchTextField.append(tk.Label(self, text=InfoDb.get("search_column")[col // 2] + " : "))
                 ListInfoSearchTextField[-1].grid(row=row, column=col % 4 + sup, columnspan=columnspan, sticky="")
-                ListInfoSearchTextField[-1].config(font=("Courier", 10))
+                ListInfoSearchTextField[-1].config(font=("Courier", 10), justify="left", height=1, width=20)
+
+        # position
+        row += 1
+
+        ReloadButton = tk.Button(self, text="Search",
+                                 command=lambda: Search(table=TableInfoUsers,
+                                                        ListInfoSearch=ListInfoSearchTextField,
+                                                        ListSearch=ListSearchTextField))
+        ReloadButton.config(height=1, width=20)
+        ReloadButton.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="")
+
+        # position
+        row += 1
+
+        # TableInfoUsers
+        TableInfoUsers = Tableau(self)
+        TableInfoUsers.grid(row=row, column=0, columnspan=self.grid_columnconfigure_Max, sticky="nsew")
 
         # position
         row += 1

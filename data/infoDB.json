@@ -5,6 +5,7 @@
   "password": "",
   "name": "",
   "table_users": "",
+  "ID_field": "",
   "column_IsActive": "",
   "search_column": [],
   "afficher_column": []
