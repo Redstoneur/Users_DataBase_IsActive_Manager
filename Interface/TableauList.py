@@ -1,3 +1,4 @@
+import tkinter as tk
 from Interface.Variable import *
 
 
@@ -6,9 +7,9 @@ class Tableau(tk.Frame):
     where: str = "1"
     _columns: int = 10
     _rows: int = 10
-    _widgets: list[list[tk.Label]] = []
+    _widgets: list[list] = []
 
-    def __init__(self, parent, limit: int | None = 10, where: str = "1"):
+    def __init__(self, parent, limit: int | None = 10, where: str = "1") -> None:
         """
         constructor of the class
         :param parent: tk.Frame, parent of the widget
@@ -72,27 +73,44 @@ class Tableau(tk.Frame):
             current_row = []
             for column in range(self._columns):
                 if column == self._columns - 1 and row != 0:
-                    relative_ID: int = int(liste[row][0])
+                    relative_ID: str = str(liste[row][0])
 
                     actif: bool = DB.select(table=str(InfoDb.get("table_users")),
                                             select=[str(InfoDb.get("column_IsActive"))],
-                                            where=str(InfoDb.get("ID_field")) + " = " + str(relative_ID)
+                                            where=str(InfoDb.get("ID_field")) + " = " + relative_ID
                                             )[0][0]
 
-                    if actif:
-                        current_row.append(tk.Button(self, text="Actif", bg="green",
-                                                     command=lambda: self.activity_Button(id=relative_ID,
-                                                                                          setActivity=False)))
+                    if self._rows <= 2:
+                        if actif:
+                            current_row.append(tk.Button(self, text="Actif", bg="green",
+                                                         command=lambda: self.activity_Button(id=relative_ID,
+                                                                                              setActivity=False)))
+                        else:
+                            current_row.append(tk.Button(self, text="Inactif", bg="red",
+                                                         command=lambda: self.activity_Button(id=relative_ID,
+                                                                                              setActivity=True)))
                     else:
-                        current_row.append(tk.Button(self, text="Inactif", bg="red",
-                                                     command=lambda: self.activity_Button(id=relative_ID,
-                                                                                          setActivity=True)))
+                        if actif:
+                            current_row.append(tk.Label(self, text="Actif", bg="green"))
+                        else:
+                            current_row.append(tk.Label(self, text="Inactif", bg="red"))
+
                 else:
                     if liste is not None:
-                        string: str = str(liste[row][column])
+                        if liste[row][column] == "" or liste[row][column] is None:
+                            string: str = " "
+                        elif liste[row][column] == "2002-09-21 02:30:00":
+                            string: str = "🔘"
+                        else:
+                            string: str = str(liste[row][column])
                     else:
                         string: str = '(' + str(row) + ':' + str(column) + ')'
                     current_row.append(tk.Label(self, text=string))
+
+                if row == 0:
+                    current_row[column].config(font=("Arial", 12, "bold"))
+
+                current_row[-1].config(borderwidth=1, relief="solid")
 
                 current_row[-1].grid(row=row, column=column, sticky="nsew")
             self._widgets.append(current_row)
@@ -115,22 +133,23 @@ class Tableau(tk.Frame):
         :return: None
         """
         listOfUsers = DB.select(table=str(InfoDb.get("table_users")),
-                                select=list(afficher_column),
+                                select=list(afficher_columns),
                                 where=self.where,
                                 limit=self.limit)
         if listOfUsers is None or len(listOfUsers) == 0:
-            self.update(liste=[afficher_column_table], clean=clean)
+            self.update(liste=[afficher_column_tables], clean=clean)
         else:
-            self.update(liste=[afficher_column_table] + listOfUsers, clean=clean)
+            self.update(liste=[afficher_column_tables] + listOfUsers, clean=clean)
 
-    def activity_Button(self, id: int, setActivity: bool) -> None:
+    def activity_Button(self, id: str, setActivity: bool) -> None:
         """
         the effect of the activity button
         :return:
         """
+        print("id: " + id + " setActivity: " + str(setActivity))
         DB.update(table=str(InfoDb.get("table_users")),
                   set=[[str(InfoDb.get("column_IsActive")), str(setActivity)]] +
                       list(InfoDb.get("set_IsActive_special")),
-                  where=str(InfoDb.get("ID_field")) + " = " + str(id))
+                  where=str(InfoDb.get("ID_field")) + " = " + id)
 
         self.load()

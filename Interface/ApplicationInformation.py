@@ -1,4 +1,4 @@
-from Utilities import JsonFile
+from Utilities import JsonFile, Error
 
 
 ######################################################################################################################
@@ -10,6 +10,9 @@ class ApplicationInformation:
     Class for application information
     """
 
+    listName_en = ["name", "version", "description-en", ["author", "firstName", "lastName", "email"]]
+    listName_fr = ["name", "version", "description-fr", ["author", "firstName", "lastName", "email"]]
+
     __file_path: str
     __file: JsonFile
 
@@ -20,27 +23,54 @@ class ApplicationInformation:
     author_last_name: str
     email: str
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, language: str = "en"):
         """
         Constructor
         :param file_path: str, path to the file
         """
+        listName: list = []
 
         self.__file_path: str = file_path
         self.__file: JsonFile = JsonFile(file_path)
 
-        # noinspection PyTypeChecker
-        self.name: str = self.get("name")
-        # noinspection PyTypeChecker
-        self.version: str = self.get("version")
-        # noinspection PyTypeChecker
-        self.description: str = self.get("description-en")
-        # noinspection PyTypeChecker
-        self.author_first_name: str = self.get("author")["firstName"]
-        # noinspection PyTypeChecker
-        self.author_last_name: str = self.get("author")["lastName"]
-        # noinspection PyTypeChecker
-        self.email: str = self.get("author")["email"]
+        if language == "en":
+            listName: list = self.listName_en
+        elif language == "fr":
+            listName: list = self.listName_fr
+        else:
+            exit(Error(success=False, message="Language not supported", code=500))
+
+        for i in range(len(listName)):
+            elemment: object = listName[i]
+            if type(elemment) is list:
+                e: str = elemment[0]
+            else:
+                e: str = str(elemment)
+
+            var: object = self.get(e)
+
+            if var is None:
+                exit(Error(success=False, message="The " + e + " is not defined", code=404).__str__())
+            elif isinstance(var, str):
+                if e == "name":
+                    self.name: str = var
+                elif e == "version":
+                    self.version: str = var
+                elif e == "description-en":
+                    self.description: str = var
+                elif e == "description-fr":
+                    self.description: str = var
+                else:
+                    exit(Error(success=False, message="The " + e + " is not correctly defined", code=500).__str__())
+            elif isinstance(var, dict):
+                if e == "author":
+                    self.author_first_name: str = var[elemment[1]]
+                    self.author_last_name: str = var[elemment[2]]
+                    self.email: str = var[elemment[3]]
+                else:
+                    exit(Error(success=False, message="The " + e + " is not correctly defined", code=500).__str__())
+            else:
+                print(Error(success=False, message="The " + e +" is not defined", code=404).__str__())
 
     def get(self, key: str) -> object:
         """

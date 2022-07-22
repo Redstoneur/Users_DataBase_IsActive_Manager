@@ -1,16 +1,5 @@
 from Interface.TableauList import *
 
-def CleanTerminal() -> None:
-    """
-    clean the terminal
-    :return: None
-    """
-    # if the os is windows
-    if my_os == "Windows":
-        os.system("cls")
-    else:  # if the os is linux
-        os.system("clear")
-
 
 def Search(table: Tableau,
            ListInfoSearch: list[tk.Label],
@@ -18,6 +7,8 @@ def Search(table: Tableau,
     """
     reload the list of users
     :param table: Table, table of users
+    :param ListSearch: list, list of the search
+    :param ListInfoSearch: list, list of the info search
     :return: None
     """
     # create of Where clause

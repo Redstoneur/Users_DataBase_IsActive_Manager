@@ -2,7 +2,7 @@ from Interface import *
 
 
 def main():
-    inter: Interface = Interface([600, 700])
+    inter: Interface = Interface([700, 700])
 
     inter.mainloop()
 
