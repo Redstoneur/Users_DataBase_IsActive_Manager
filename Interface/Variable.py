@@ -24,7 +24,8 @@ def verify_set_IsActive_special() -> bool:
     else:
         return False
 
-def verify_list_colluns(txt:str) -> bool:
+
+def verify_list_colluns(txt: str) -> bool:
     """
     verify if the list_colluns function is correctly defined
     :return:
@@ -99,9 +100,19 @@ def verify_connection():
 ################################## Variables ###########################################################################
 ########################################################################################################################
 
-InfoDb: JsonFile = JsonFile("./data/infoDB.json")
+# Récupération des informations sur l'application
 Info: ApplicationInformation = ApplicationInformation("./data/package.json")
+
+# Récupération des informations de connexion à la base de données
+InfoDb: JsonFile = JsonFile("./data/infoDB.json")
+
+# Connection to the database
 DB: DatabaseExecutor = verify_connection()
 
-afficher_columns: list[str] = list(InfoDb.get("afficher_column"))
-afficher_column_tables: list[str] = list(InfoDb.get("afficher_column")) + ["2002-09-21 02:30:00"]
+# ----------------------------------------------------------------------------------------------------------------------
+
+# noinspection PyTypeChecker
+var: list = list(InfoDb.get("afficher_column"))
+afficher_columns: list[str] = list(var)
+afficher_column_tables: list[str] = list(var) + ["2002-09-21 02:30:00"]
+del var
